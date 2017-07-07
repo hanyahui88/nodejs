@@ -1,0 +1,16 @@
+$zindex:99;
+$aa:#666666;
+$bb:#777777;
+
+h1{
+  font-size: medium;
+}
+div{
+  width: auto;
+  height:auto;
+  z-index: $zindex;
+  display: inline;
+}
+p{
+  background-color: $bb;
+}
