@@ -3,18 +3,25 @@ var gulp=require('gulp');
     borwserSync = require('browser-sync').create(),
     reload = borwserSync.reload,
     watch = require('gulp-watch'),
-    scss = require('gulp-scss');
+    sass = require('gulp-sass');
     minify = require('gulp-minify');
     cssmin = require('gulp-minify-css');
     clean = require('gulp-clean');
     notify = require('gulp-notify');
     gulpSequence = require('gulp-sequence');
+    prefix = require('gulp-autoprefixer');
 
 //定义一个scss任务（自定义任务名称）
 gulp.task('scss', function () {
     gulp.src('src/scss/*.scss') //该任务针对的文件
-        .pipe(scss()) //将scss转换成css
-        .pipe(cssmin()) //压缩css
+        .pipe(sass({"bundleExec": true}).on('error', sass.logError)) //将scss转换成css
+        // .pipe(prefix({
+        //     browsers: ['last 2 version', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'],
+        //     cascade: true, //是否美化属性值 默认：true 像这样：
+        //     //-webkit-transform: rotate(45deg);
+        //     //        transform: rotate(45deg);
+        //     remove:true})) //是否去掉不必要的前缀 默认：true   prefix 报错
+        // .pipe(cssmin()) //压缩css
         .pipe(gulp.dest('build/static/css'))
         .pipe(reload({stream: true})) //重新加载
         .pipe(notify("scss success!!!"));
@@ -41,7 +48,6 @@ gulp.task('browser-sync',function(){
          }
      });
     gulp.watch('src/scss/*.scss',['scss']);
-    gulp.watch('src/js/*.js',['js']);
     gulp.watch("static/*.html").on('change',reload);
 });
 //清除以前生成的文件

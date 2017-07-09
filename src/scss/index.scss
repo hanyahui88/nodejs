@@ -1,3 +1,4 @@
+//全局变量
 $zindex:99;
 $aa:#666666;
 $bb:#777777;
@@ -5,12 +6,200 @@ $bb:#777777;
 h1{
   font-size: medium;
 }
+
 div{
+  //局部变量
+  $zindex:88;
   width: auto;
   height:auto;
   z-index: $zindex;
   display: inline;
 }
+
 p{
   background-color: $bb;
+}
+
+$highlight-color: #F90;
+$highlight-border: 1px solid $highlight-color;
+
+.selected {
+  border: $highlight-border;
+}
+
+.selected div{
+  border: $highlight_border; //$highlight-border和$highlight_border是等值的，建议用同一种
+}
+
+//嵌套css
+//这个过程中，sass用了两步，每一步都是像打开俄罗斯套娃那样把里边的嵌套规则块一个个打开。
+//首先，把#content（父级）这个id放到article选择器（子级）和aside选择器（子级）的前边.
+//也叫后代选择器
+#content {
+  article {
+    h1 { color: #333 }
+    p { margin-bottom: 1.4em }
+  }
+  aside { background-color: #EEE }
+}
+
+/////////////父选择器的标识符&////////////////
+
+//大多数情况下这种简单的嵌套都没问题，但是有些场景下不行，比如你想要在嵌套的选择器 里边立刻应用一个类似于：hover的伪类。
+// 为了解决这种以及其他情况，sass提供了一个特殊结 构&。
+//父选择器 &  ，但是实验的时候发现加不加&都没有区别，可能是scss自己优化了
+article a {
+  color: blue;
+  &:hover { color: red }
+}
+
+//在为父级选择器添加：hover等伪类时，这种方式非常有用。
+// 同时父选择器标识符还有另外一种用法，你可以在父选择器之前添加选择器。
+// 举例来说，当用户在使用IE浏览器时，你会通过JavaScript在<body>标签上添加一个ie的类名，为这种情况编写特殊的样式如下：
+#content aside {
+  color: red;
+  body.ie & { color: green }
+}
+
+/////////////群组选择器的嵌套////////////////
+
+.container {
+  h1, h2, h3 {margin-bottom: .8em}
+}
+
+////////////子组合选择器和同层组合选择器：>、+和~//////////
+
+//第一个选择器会选择article下的所有命中section选择器的元素。
+// 第二个选择器只会选择article下紧跟着的子元素中命中section选择器的元素
+article section { margin: 5px }
+article > section { border: 1px solid #ccc }
+
+//用同层相邻组合选择器+选择header元素后紧跟的p元素
+header + p { font-size: 1.1em }
+
+//同层全体组合选择器~，选择所有跟在article后的同层article元素，不管它们之间隔了多少其他元素：
+article ~ article { border-top: 1px dashed #ccc }
+
+//上面4个例子的scss写法
+article {
+  ~ article { border-top: 1px dashed #ccc }
+  > section { background: #eee }
+  dl > {
+    dt { color: #333 }
+    dd { color: #555 }
+  }
+  nav + & { margin-top: 0 }
+}
+
+////////////////////嵌套属性/////////////////////
+nav {
+  border: {
+    style: solid;
+    width: 1px;
+    color: #ccc;
+  }
+}
+
+nav {
+  border: 1px solid #ccc {
+    left: 0px;
+    right: 0px;
+  }
+}
+
+///////////////////导入SASS文件//////////////
+
+///////////////使用SASS部分文件//////
+//此约定即，sass局部文件的文件名以下划线开头这样，sass就不会在编译时单独编译这个文件输出css，而只把这个文件用作导入。
+// 当你@import一个局部文件时，还可以不写文件的全名，即省略文件名开头的下划线。
+// 举例来说，你想导入themes/_night-sky.scss这个局部文件里的变量，你只需在样式表中写@import "themes/night-sky";
+
+/////////////默认变量值/////////////
+//!default 如果这个变量被声明赋值了，那就用它声明的值，否则就用这个默认值。
+//如果用户在导入你的sass局部文件之前声明了一个$fancybox-width变量，那么你的局部文件中对$fancybox-width赋值400px的操作就无效。
+// 如果用户没有做这样的声明，则$fancybox-width将默认为400px。
+$fancybox-width: 400px !default;
+.fancybox {
+  width: $fancybox-width;
+}
+
+////////////////嵌套导入//////////
+.blue-theme {
+  @import "blue-theme";
+}
+
+
+
+//////////原生的CSS导入///////////
+//由于sass兼容原生的css，所以它也支持原生的CSS@import。尽管通常在sass中使用@import时，sass会尝试找到对应的sass文件并导入进来，但在下列三种情况下会生成原生的CSS@import，尽管这会造成浏览器解析css时的额外下载：
+//被导入文件的名字以.css结尾；
+//被导入文件的名字是一个URL地址（比如http://www.sass.hk/css/css.css），由此可用谷歌字体API提供的相应服务；
+//被导入文件的名字是CSS的url()值。
+
+///////////////静默注释////////////////
+
+// 使用//的注释和/*.....*/都可以在编译成css的时候被删掉
+
+
+//////////////混合器////////////////////////////
+//混合器使用@mixin标识符定义  这样你就可以轻易地通过引用这个名字重用这段样式
+@mixin rounded-corners {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.notice {
+  background-color: green;
+  border: 2px solid #00aa00;
+  //使用@include 使用混合器
+  @include rounded-corners;
+}
+
+@mixin no-bullets {
+  list-style: none;
+  li {
+    list-style-image: none;
+    list-style-type: none;
+    margin-left: 0px;
+  }
+}
+ul.plain {
+  color: #444;
+  @include no-bullets;
+}
+
+/////////给混合器传参////////////////
+
+@mixin link-colors($normal, $hover, $visited) {
+  color: $normal;
+  &:hover { color: $hover; }
+  &:visited { color: $visited; }
+}
+a {
+  @include link-colors(blue, red, green);
+}
+a {
+  @include link-colors(
+          $normal: blue,
+          $visited: green,
+          $hover: red
+  );
+}
+
+/////////设置默认值//////////
+@mixin link-colors($normal,$hover: $normal,$visited: $normal) {
+  color: $normal;
+  &:hover { color: $hover; }
+  &:visited { color: $visited; }
+}
+
+//////////////使用选择器继承来精简CSS/////////////
+.error {
+  border: 1px red;
+  background-color: #fdd;
+}
+.seriousError {
+  @extend .error;
+  border-width: 3px;
 }
