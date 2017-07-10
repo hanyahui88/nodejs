@@ -1,0 +1,56 @@
+/*
+数据类型 (Data Types)
+
+  数字，1, 2, 13, 10px
+  字符串，有引号字符串与无引号字符串，"foo", 'bar', baz
+  颜色，blue, #04a3f9, rgba(255,0,0,0.5)
+  布尔型，true, false
+  空值，null
+  数组 (list)，用空格或逗号作分隔符，1.5em 1em 0 2em, Helvetica, Arial, sans-serif
+  maps, 相当于 JavaScript 的 object，(key1: value1, key2: value2)
+ */
+//字符串
+@mixin firefox-message($selector) {
+  body.firefox #{$selector}:before {
+    content: "Hi, Firefox users!";
+  }
+}
+@include firefox-message(".header");
+
+//数组
+// 数组中可以包含子数组，比如 1px 2px, 5px 6px 是包含 1px 2px 与 5px 6px 两个数组的数组
+// 内外两层数组使用相同的分隔方式，需要用圆括号包裹内层，所以也可以写成 (1px 2px) (5px 6px)
+$arr:1px 2px;
+$arrs:1px 2px, 5px 6px;
+.arr-one{
+  width: nth($arr,1);
+}
+//.arr-two{
+//  width: nth($arrs,1);
+//}
+
+//map
+$map:(key1:10px,key2:20px);
+
+.map-one{
+  width: map_get($map,key1);
+}
+
+//运算
+
+p {
+  font: 10px/8px;             // Plain CSS, no division
+  $width: 1000px;
+  width: $width/2;            // Uses a variable, does division
+  //width: round(1.5)/2;        // Uses a function, does division
+  height: (500px/2);          // Uses parentheses, does division
+  margin-left: 5px + 8px/2px; // Uses +, does division
+}
+
+//如果需要使用变量，同时又要确保 / 不做除法运算而是完整地编译到 CSS 文件中，只需要用 #{} 插值语句将变量包裹。
+p {
+  $font-size: 12px;
+  $line-height: 30px;
+  font: #{$font-size}/#{$line-height};
+}
+
